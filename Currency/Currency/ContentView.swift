@@ -16,68 +16,65 @@ struct ContentView : View {
     @State var lastUpdated: String = ""
     
     var body: some View {
-        let inset = EdgeInsets(top: -8, leading: -20, bottom: -7, trailing: -15)
+        let inset = EdgeInsets(top: -8, leading: 30, bottom: -7, trailing:10)
         let doubleValue: Double = Double(self.$baseAmount.wrappedValue) ?? 1.0
         
         return ZStack(alignment: Alignment.bottomTrailing) {
             NavigationView {
-            VStack(alignment: .leading){
-                Text("From:").bold().foregroundColor(.gray)
-                HStack{
-                    // Flag
-                    Text("\(userData.baseCurrency.flag)").padding(5)
-                    // Code and name
-                    VStack(alignment: .leading){
-                        Text(userData.baseCurrency.code).foregroundColor(.white)
-                        //Text(userData.baseCurrency.name).foregroundColor(.white)
-                    }
+                VStack(alignment: .leading){
                     Spacer()
-                    // Amount and conversion
-                    TextField("1.0", text: $baseAmount, onCommit: {
-                        // TODO: update all currencies on the following list
-                    }).foregroundColor(.white)
-                        .background(
-                            RoundedRectangle(cornerRadius: 5)
-                                .fill(Color.clear)
-                                .background(RoundedRectangle(cornerRadius: 5).strokeBorder(Color(red: 0.7, green: 0.7, blue: 0.7), lineWidth: 1 / UIScreen.main.scale))
-                                .padding(inset)
-                        )
-                        .multilineTextAlignment(.trailing)
-                }.background(Color.blue).cornerRadius(5)
-                Text("To:").bold().foregroundColor(.gray)
-                List {
-                    // TODO: should filter out BaseCurrency from list
-                    ForEach(userData.userCurrency) { currency in
-                        CurrencyItemView(currency: currency, baseAmount: doubleValue, isEditing: self.$isEditing).onTapGesture {
+                    Text("From:").bold().foregroundColor(.gray)
+                    HStack{
+                        // Flag
+                        Text("\(userData.baseCurrency.flag)").padding(5).frame(height: 44,alignment: .leading)
+                        // Code and name
+                        Text(userData.baseCurrency.code).foregroundColor(.white).padding(5)
+                        
+                        Spacer()
+                        // Amount and conversion
+                        TextField("1.0", text: $baseAmount, onCommit: {
+                            // TODO: update all currencies on the following list
+                        }).foregroundColor(.white)
+                            .multilineTextAlignment(.trailing)
+                            .padding(inset)
+                            .keyboardType(.decimalPad)
+                    }.background(Color.blue).cornerRadius(5)
+                    Spacer()
+                    Text("To:").bold().foregroundColor(.gray)
+                    List {
+                        // TODO: should filter out BaseCurrency from list
+                        ForEach(userData.userCurrency) { currency in
+                            CurrencyItemView(currency: currency, baseAmount: doubleValue, isEditing: self.$isEditing).onTapGesture {
                                 // Swap this and base
                                 self.userData.baseCurrency = currency
                             }
                         }
                     }.onAppear(perform: loadCurrencies)
-                    .navigationBarTitle(Text("Currencies 💱"))
-                    .navigationBarItems(trailing: Button(action: { self.isEditing.toggle() }) {
-                        if !self.isEditing {
-                            Text("Edit")
-                        } else {
-                            Text("Done").bold()
-                        }
-                    })
-                HStack {
-                    Text("Last updated: \(self.lastUpdated)")
-                        .foregroundColor(.gray).italic()
-                Spacer()
-
-            NavigationLink(destination: AddCurrencyView().environmentObject(self.userData)) {
-                    Text("💰")
-                }.frame(width: 46, height: 46, alignment: .center)
-                .background(
-                    RoundedRectangle(cornerRadius: 23)
-                        .fill(Color.clear)
-                        .background(RoundedRectangle(cornerRadius: 23).strokeBorder(Color(red: 0.7, green: 0.7, blue: 0.7), lineWidth: 1 / UIScreen.main.scale)))
-                .foregroundColor(.white).font(.largeTitle)
-        }.padding()
+                        .navigationBarTitle(Text("Currencies 💱🤑"))
+                        .navigationBarItems(trailing: Button(action: { self.isEditing.toggle() }) {
+                            if !self.isEditing {
+                                Text("Edit")
+                            } else {
+                                Text("Done").bold()
+                            }
+                        })
+                    HStack {
+                        Text("Last updated: \(self.lastUpdated)")
+                            .foregroundColor(.gray).italic()
+                        	.font(.subheadline)
+                        Spacer()
+                        
+                        NavigationLink(destination: AddCurrencyView().environmentObject(self.userData)) {
+                            Text("More💰")
+                        }.frame(width: 60, height: 46, alignment: .center)
+//                            .background(
+//                                RoundedRectangle(cornerRadius: 23)
+//                                    .fill(Color.clear)
+//                                    .background(RoundedRectangle(cornerRadius: 23).strokeBorder(Color(red: 0.7, green: 0.7, blue: 0.7), lineWidth: 1 / UIScreen.main.scale)))
+//                            .foregroundColor(.white).font(.largeTitle)
+                    }.padding()
                 }
-        }
+            }
         }
     }
     
@@ -85,7 +82,7 @@ struct ContentView : View {
         // Check if last updated is the same date
         // if not the same pull from remote with base currency
         let url = URL(string: "https://api.exchangeratesapi.io/latest?base=USD")!
-
+        
         let task = URLSession.shared.dataTask(with: url, completionHandler: { data, _, _ in
             if let data = data {
                 if let decoded: CurrencyList = self.decodeData(CurrencyList.self, data){
