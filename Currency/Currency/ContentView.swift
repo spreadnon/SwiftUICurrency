@@ -59,14 +59,14 @@ struct ContentView : View {
                             }
                         })
                     HStack {
-                        Text("Last updated: \(self.lastUpdated)")
-                            .foregroundColor(.gray).italic()
-                        	.font(.subheadline)
+//                        Text("-Last updated: \(self.lastUpdated)-")
+//                            .foregroundColor(.gray).italic()
+//                        	.font(.subheadline)
                         Spacer()
                         
                         NavigationLink(destination: AddCurrencyView().environmentObject(self.userData)) {
                             Text("More💰")
-                        }.frame(width: 60, height: 46, alignment: .center)
+                        }.frame(width: 60, height: 46, alignment: .trailing)
 //                            .background(
 //                                RoundedRectangle(cornerRadius: 23)
 //                                    .fill(Color.clear)
